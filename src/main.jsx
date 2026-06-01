@@ -153,6 +153,7 @@ function App() {
   const findings = findingsByOrg[organizationId];
   const isProcessing = jobState === "processing";
   const isComplete = jobState === "complete";
+  const tenantJobPrefix = organizationId.toUpperCase();
 
   useEffect(() => {
     setSelectedFile(null);
@@ -203,6 +204,17 @@ function App() {
 
   const errorCount = findings.filter((item) => item.severity === "Error").length;
   const warningCount = findings.filter((item) => item.severity === "Warning").length;
+  const metrics = isComplete
+    ? [
+        ["Critical errors", errorCount, "text-rose-300"],
+        ["Warnings", warningCount, "text-amber-300"],
+        ["Resolved trend", organization.findingsResolved, "text-emerald-300"],
+      ]
+    : [
+        ["Critical errors", "-", "text-slate-500"],
+        ["Warnings", "-", "text-slate-500"],
+        ["Resolved trend", "-", "text-slate-500"],
+      ];
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -316,7 +328,7 @@ function App() {
                 />
               </div>
               <div className="mt-2 flex justify-between text-xs text-slate-500">
-                <span>Tenant-scoped job ID: {organizationId.toUpperCase()}-PDF-0924</span>
+                <span>Tenant-scoped job ID: {tenantJobPrefix}-PDF-0924</span>
                 <span>{progress}%</span>
               </div>
             </div>
@@ -324,11 +336,7 @@ function App() {
 
           <section className="flex flex-col gap-5">
             <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                ["Critical errors", errorCount, "text-rose-300"],
-                ["Warnings", warningCount, "text-amber-300"],
-                ["Resolved trend", organization.findingsResolved, "text-emerald-300"],
-              ].map(([label, value, color]) => (
+              {metrics.map(([label, value, color]) => (
                 <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 shadow-xl shadow-black/10">
                   <p className="text-sm text-slate-400">{label}</p>
                   <p className={`mt-2 text-3xl font-semibold ${color}`}>{value}</p>
